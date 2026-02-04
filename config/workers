@@ -1,0 +1,3 @@
+# DataNode / NodeManager 호스트 (StatefulSet pod 이름)
+datanode-0.datanode-svc.hadoop.svc.cluster.local
+datanode-1.datanode-svc.hadoop.svc.cluster.local

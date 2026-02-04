@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: namenode
+  namespace: hadoop
+spec:
+  serviceName: namenode-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: namenode
+  template:
+    metadata:
+      labels:
+        app: namenode
+    spec:
+      securityContext:
+        runAsUser: 0
+      initContainers:
+        - name: format
+          image: apache/hadoop:3.4.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              if [ ! -f /hadoop/dfs/name/current/VERSION ]; then
+                echo "Formatting NameNode..."
+                hdfs namenode -format -force
+              else
+                echo "NameNode already formatted"
+              fi
+          volumeMounts:
+            - name: namenode-data
+              mountPath: /hadoop/dfs/name
+            - name: hadoop-config
+              mountPath: /opt/hadoop/etc/hadoop
+              readOnly: true
+      containers:
+        - name: namenode
+          image: apache/hadoop:3.4.0
+          command: ["hdfs", "namenode"]
+          ports:
+            - containerPort: 8020
+            - containerPort: 9870
+          volumeMounts:
+            - name: namenode-data
+              mountPath: /hadoop/dfs/name
+            - name: hadoop-config
+              mountPath: /opt/hadoop/etc/hadoop
+              readOnly: true
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+      volumes:
+        - name: hadoop-config
+          configMap:
+            name: hadoop-config
+  volumeClaimTemplates:
+    - metadata:
+        name: namenode-data
+      spec:
+        storageClassName: local-path
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
