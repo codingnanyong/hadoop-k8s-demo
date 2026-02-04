@@ -10,7 +10,7 @@ This document describes the storage architecture and component layout of the Had
 
 ```text
                     ┌─────────────────────────────────────────────────────────────┐
-                    │                    Kubernetes Cluster (node)                 │
+                    │                    Kubernetes Cluster (node)                │
                     │                                                             │
   ┌─────────────────┴──────────────────────────────────────────────────────────┐  │
   │                         hadoop namespace                                   │  │
